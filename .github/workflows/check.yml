@@ -1,0 +1,45 @@
+name: Check for whales
+
+on:
+  schedule:
+    # Every 15 minutes during daylight hours (PT). Cron is in UTC.
+    # 13:00 UTC = 6am PT, 04:00 UTC = 9pm PT.
+    - cron: '*/15 13-23,0-4 * * *'
+  workflow_dispatch:  # Lets you trigger it manually from the Actions tab
+
+permissions:
+  contents: write  # Needed to commit seen_ids.json back to the repo
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests twilio
+
+      - name: Run check
+        env:
+          ACARTIA_TOKEN: ${{ secrets.ACARTIA_TOKEN }}
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_AUTH: ${{ secrets.TWILIO_AUTH }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          TWILIO_TO: ${{ secrets.TWILIO_TO }}
+          HOME_LAT: ${{ vars.HOME_LAT }}
+          HOME_LON: ${{ vars.HOME_LON }}
+          RADIUS_MILES: ${{ vars.RADIUS_MILES }}
+          SPECIES: ${{ vars.SPECIES }}
+        run: python check_whales.py
+
+      - name: Commit updated state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_ids.json || true
+          git diff --staged --quiet || git commit -m "Update seen sightings"
+          git push || true
