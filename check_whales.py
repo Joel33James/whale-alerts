@@ -19,12 +19,12 @@ from twilio.rest import Client
 # ---------- CONFIG (via environment variables / GitHub Secrets) ----------
 
 # Your home location (defaults to downtown Seattle if unset)
-HOME_LAT = float(os.environ.get("HOME_LAT", "47.65017449949859"))
-HOME_LON = float(os.environ.get("HOME_LON", "-122.33102146225346"))
+HOME_LAT = float(os.environ.get("HOME_LAT") or "47.65017449949859")
+HOME_LON = float(os.environ.get("HOME_LON") or "-122.33102146225346")
 
 # How far you'll drive. ~20 min in Seattle traffic = roughly 12 miles as
 # the crow flies. Tune to taste.
-RADIUS_MILES = float(os.environ.get("RADIUS_MILES", "500"))
+RADIUS_MILES = float(os.environ.get("RADIUS_MILES") or "500")
 
 # Only alert on sightings that are this fresh. Sightings older than this
 # are skipped (they're stale by the time we'd drive there).
