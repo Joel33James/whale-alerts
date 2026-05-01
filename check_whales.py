@@ -201,11 +201,11 @@ def main():
         if dist > RADIUS_MILES:
             continue
 
-        ts = parse_timestamp(s.get("created") or s.get("timestamp"))
-        if ts and ts < cutoff:
-            # Too old to bother
-            new_seen.add(sid)  # mark so we don't re-check
-            continue
+        # Age filter disabled — alert on any unseen sighting regardless of age
+        # ts = parse_timestamp(s.get("created") or s.get("timestamp"))
+        # if ts and ts < cutoff:
+        #     new_seen.add(sid)
+        #     continue
 
         msg = format_alert(s, dist)
         print(f"  ALERT: {msg}")
